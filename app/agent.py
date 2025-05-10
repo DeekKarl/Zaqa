@@ -1,8 +1,8 @@
+import os
 import requests
 from langchain.agents import initialize_agent, AgentType
 from langchain.tools import Tool
-from langchain.chat_models import ChatOpenAI
-
+from langchain.llms import LlamaCpp
 
 def vector_search_tool(q: str) -> dict:
     res = requests.post("http://localhost:8000/match/skus", json={"skus": [q]})
@@ -16,12 +16,18 @@ tools = [
     )
 ]
 
+llm = LlamaCpp(
+    model_path=os.getenv("LCPP_MODEL_PATH"),
+    n_ctx=2048,
+    temperature=0
+)
+
 agent = initialize_agent(
     tools,
-    ChatOpenAI(model_name="gpt-4o-mini", temperature=0),
+    llm,
     agent_type=AgentType.OPENAI_FUNCTIONS,
     system_message="""
     You are an order-entry assistant. Given a raw token, call the tool and choose the best match.
-    Return JSON: {\"sku\": \"...\", \"status\": \"CONFIRMED|AMBIGUOUS\"}
+    Return JSON: {"sku": "...", "status": "CONFIRMED|AMBIGUOUS"}
     """
 )
