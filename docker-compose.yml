@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    container_name: zaqa-db
+    environment:
+      POSTGRES_USER: zaqa
+      POSTGRES_PASSWORD: zaqa_pass
+      POSTGRES_DB: zaqa
+    volumes:
+      - zaqa_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    command: >
+      bash -c "
+        echo 'host all all 0.0.0.0/0 trust' >> /var/lib/postgresql/data/pg_hba.conf &&
+        docker-entrypoint.sh postgres
+      "
+
+volumes:
+  zaqa_data:
