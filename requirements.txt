@@ -1,1 +1,9 @@
-#placeholder need to add download requirements
+fastapi
+uvicorn[standard]
+asyncpg
+openai
+langchain
+rapidfuzz
+pgvector
+requests
+python-dotenv
