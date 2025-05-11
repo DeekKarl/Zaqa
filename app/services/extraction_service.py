@@ -1,23 +1,30 @@
 import io
 import re
 import csv
-import logging
 import tempfile
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from PIL import Image
+from fastapi import File, HTTPException, UploadFile
 import pandas as pd
 from pdf2image import convert_from_bytes
-from PIL import Image
 import pytesseract
 from word2number import w2n
 import inflect
-
 from invoice2data import extract_data as invoice_extract
 
-app = FastAPI()
-logging.basicConfig(level=logging.INFO)
+from schema.models import Item
+
 inflector = inflect.engine()
+
+# pre-compile your regexes once
+_RX_SPLIT_PHRASES = re.compile(r'\band\b|,|;', flags=re.IGNORECASE)
+_RX_PATTERN1    = re.compile(r'^(?:x|×)\s*(.+)$', re.IGNORECASE)
+_RX_PATTERN2    = re.compile(r'^(?P<name>.+?):\s*(?P<q>\d+)$')
+_RX_PATTERN3    = re.compile(r'^(?P<num>\d+|\w+)\s+(?P<d>.+)$')
+
+class UnsupportedFileType(Exception):
+    pass
 
 def ocr_image(image: Image.Image) -> str:
     return pytesseract.image_to_string(image)
@@ -155,7 +162,6 @@ def extract_items_from_csv(data: bytes) -> List[Dict[str,int]]:
             lines.append(" ".join(row))
     return extract_items_from_text("\n".join(lines))
 
-@app.post("/extract_order")
 async def extract_order(file: UploadFile = File(...)):
     data: bytes = await file.read()
     items: List[Dict[str,int]]
