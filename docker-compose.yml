@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: zaqa
+      POSTGRES_PASSWORD: zaqa_pass
+      POSTGRES_DB: zaqa
+    ports:
+      - "5432:5432"
+    volumes:
+      - zaqa_data:/var/lib/postgresql/data
+
+volumes:
+  zaqa_data:
