@@ -1,6 +1,4 @@
-# routes/extract_order.py
 from fastapi import APIRouter, FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
 
 from services.extraction_service import process_file, UnsupportedFileType
 from schema.models import Item, ExtractionResult

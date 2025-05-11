@@ -13,8 +13,6 @@ from word2number import w2n
 import inflect
 from invoice2data import extract_data as invoice_extract
 
-from schema.models import Item
-
 inflector = inflect.engine()
 
 # pre-compile your regexes once
